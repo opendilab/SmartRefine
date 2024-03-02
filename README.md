@@ -1,6 +1,6 @@
 # SmartRefine: An Scenario-Adaptive Refinement Framework for Efficient Motion Prediction
 
-![pipeline](assets/pipeline_v3_1118.pdf)
+![pipeline](assets/pipeline.png)
        
 > Yang Zhou, Hao Shao, Letian Wang, Steven L. Waslander, Hongsheng Li, Yu Liu
 
