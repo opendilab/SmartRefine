@@ -11,4 +11,4 @@ This work introduces a novel approach to refining motion predictions in autonomo
 
 ## License
 
-All code within this repository is under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).`
+All code within this repository is under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
