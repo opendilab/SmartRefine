@@ -10,9 +10,9 @@ This repository contains the official implementation of [SmartRefine: A Scenario
 [![Code License](https://img.shields.io/badge/Code%20License-Apache_2.0-green.svg)](https://github.com/tatsu-lab/stanford_alpaca/blob/main/LICENSE)
 
 ## News
-- `[22 Mar., 2023]` We released our code for [Argoverse 1](https://github.com/argoverse/argoverse-api). Give it a try!
-- `[18 Mar., 2023]` We released our SmartRefine paper on [<u>_arXiv_</u>](https://arxiv.org/abs/2403.11492).
-- `[27 Feb., 2023]` Our SmartRefine was accepted by _CVPR 2024_.
+- `[22 Mar., 2024]` We released our code for [Argoverse 1](https://github.com/argoverse/argoverse-api). Give it a try!
+- `[18 Mar., 2024]` We released our SmartRefine paper on [<u>_arXiv_</u>](https://arxiv.org/abs/2403.11492).
+- `[27 Feb., 2024]` Our SmartRefine was accepted by _CVPR 2024_.
 
 ## Getting Started
 1\. Clone this repository:

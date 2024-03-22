@@ -99,7 +99,6 @@ if __name__ == '__main__':
     model.eval()
     metrics = PredictionMetrics()
     for data in tqdm(dataloader):
-        data, _ = data
         data.to("cuda")
         with torch.no_grad():
             #! infer your model here and output trajectory and embeddings.
