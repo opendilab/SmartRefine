@@ -60,7 +60,7 @@ exp=smartref_hivt_argo1
 ngpus=8
 pwd
 
-python train_pl.py \
+python train.py \
        --data_root $data_root --p1_root $p1_root --exp $exp \
        --gpus $ngpus --embed_dim 64 --refine_num 5 --seg_num 2 \
        --refine_radius -1 --r_lo 2 --r_hi 10 \
