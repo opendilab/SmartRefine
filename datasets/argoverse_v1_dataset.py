@@ -25,7 +25,7 @@ class ArgoverseV1Dataset(Dataset):
                  local_radius: float = 50) -> None:
         self._split = split
         self._local_radius = local_radius
-        self._url = f'https://s3.amazonaws.com/argoai-argoverse/forecasting_{split}_v1.1.tar.gz'
+
         if split == 'sample':
             self._directory = 'forecasting_sample'
         elif split == 'train':
@@ -36,12 +36,16 @@ class ArgoverseV1Dataset(Dataset):
             self._directory = 'test_obs'
         else:
             raise ValueError(split + ' is not valid')
+        
         self.data_root = data_root
         self.p1_root = p1_root
         self._raw_file_names = os.listdir(self.raw_dir)
-        self._processed_file_names = [os.path.splitext(f)[0] + '.pt' for f in self.raw_file_names]
+
+        self._processed_file_names = [os.path.splitext(f)[0] + '.pkl' for f in self.raw_file_names]
         self._processed_paths = [os.path.join(self.processed_dir, f) for f in self._processed_file_names]
-        self._p1_paths = [os.path.join(self.p1_root, f) for f in self._processed_file_names]
+
+        self._p1_paths = [os.path.join(self.p1_root, self._directory, f) for f in self._processed_file_names]
+
         super(ArgoverseV1Dataset, self).__init__(data_root, transform=transform)
 
     @property
@@ -67,16 +71,20 @@ class ArgoverseV1Dataset(Dataset):
     def process(self) -> None:
         am = ArgoverseMap()
         for raw_path in tqdm(self.raw_paths):
-            kwargs = process_argoverse(self._split, raw_path, am, self._local_radius)
-            data = TemporalData(**kwargs)
-            with open(os.path.join(self.processed_dir, str(kwargs['seq_id']) + '.pkl'), 'wb') as handle:
+            data = process_argoverse(self._split, raw_path, am, self._local_radius)
+            with open(os.path.join(self.processed_dir, str(data['seq_id']) + '.pkl'), 'wb') as handle:
                 pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def len(self) -> int:
         return len(self._raw_file_names)
 
     def get(self, idx) -> Data:
-        return pickle.load(self.processed_paths[idx]), pickle.load(self._p1_paths[idx])
+        with open(self.processed_paths[idx], 'rb') as handle:
+            data = pickle.load(handle)
+            data = Data.from_dict(data)
+        with open(self._p1_paths[idx], 'rb') as handle:
+            p1_data = pickle.load(handle)
+        return data, p1_data
 
 
 def process_argoverse(split: str,
@@ -157,7 +165,7 @@ def process_argoverse(split: str,
     seq_id = os.path.splitext(os.path.basename(raw_path))[0]
  
     return {
-        'x': x,
+        'x': x[:, :20],
         'positions': positions,  # [N, 50, 2]
         'positions_global': positions_global,
         'edge_index': edge_index,

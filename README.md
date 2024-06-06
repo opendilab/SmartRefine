@@ -18,31 +18,64 @@ If you have any concern, feel free to contact: kmzy at hnu.edu.cn or kmzy99 at g
 
 ## Getting Started
 1\. Clone this repository:
-```
+```bash
+cd $YOUR_WORK_SPACE
 git clone https://github.com/opendilab/SmartRefine.git
 cd SmartRefine
 ```
 2\. Install the dependencies:
-```
+```bash
 pip install -r requirements.txt
+cd ../
 ```
 You can selectively configure the environment in your favorite way.
 
-3\. Install the [Argoverse-API]() and download the [Argoverse Motion Forecasting Dataset v1.1](https://www.argoverse.org/av1.html) following the corresponding User Guide.
+3\. Install the [Argoverse-API](https://github.com/argoverse/argoverse-api?tab=readme-ov-file#installation) and download the [Argoverse Motion Forecasting Dataset v1.1](https://www.argoverse.org/av1.html) following the corresponding User Guide under `$YOUR_WORK_SPACE`. Here is an example of extracting the downloaded Argoverse data:
 
-4\. Download the prediction backbone's outputs at [Here](https://openxlab.org.cn/datasets/kmzy99/SmartRefine/tree/main/prediction_data). After downloading and extracting the zip file, the prediction data should be organized as follows:
+```bash
+cd $YOUR_WORK_SPACE
+mkdir argo1_data
+tar xzvf forecasting_train_v1.1.tar.gz -C ./argo1_data
+tar xzvf forecasting_val_v1.1.tar.gz -C ./argo1_data
 ```
-/path/to/p1_data_root/
-├── train/
-|   ├── 1.pkl
-|   ├── 2.pkl
-|   ├── ...
-└── val/
-    ├── 1.pkl
-    ├── 2.pkl
-    ├── ...
+
+4\. Download the prediction backbone's outputs at [Here](https://openxlab.org.cn/datasets/kmzy99/SmartRefine/tree/main/prediction_data) and extract:
+
+```bash
+cd $YOUR_WORK_SPACE
+mkdir p1_data
+unzip hivt_p1_data.zip -d ./p1_data
 ```
-Here, each pickle file contains the backbone model's outputs: predicted trajectories with a shape of $[K, T, 2]$ and trajectory features shaped as $[K, -1]$, where $K$ is the number of modalities and $T$ is the trajectory length.
+
+The final fles inside `$YOUR_WORK_SPACE` should be organized as follows:
+
+```
+$YOUR_WORK_SPACE
+├── argoverse-api
+├── argo1_data
+    ├── train
+    │   ├── data
+    │   │   ├── 1.csv
+    │   │   ├── 2.csv
+    │   │   └── ...
+    └── val
+        ├── data
+        │   ├── 1.csv
+        │   ├── 2.csv
+        │   └── ...
+        └── Argoverse-Terms_of_Use.txt
+├── p1_data
+    ├── train
+    │   ├── 1.pkl
+    │   ├── 2.pkl
+    │   └── ...
+    └── val
+        ├── 1.pkl
+        ├── 2.pkl
+        └── ...
+├── SmartRefine
+```
+Here, each pickle file inside p1_data contains the backbone model's outputs: predicted trajectories with a shape of $[K, T, 2]$ and trajectory features shaped as $[K, -1]$, where $K$ is the number of modalities and $T$ is the trajectory length.
 
 5\. **[Optional]** Generate your own model's prediction outputs.
 
@@ -50,45 +83,49 @@ As mentioned in our paper, SmartRefine is designed to be decoupled from the prim
 
 ## Training
 You can train the model on a single GPU or multiple GPUs to accelerate the training process:
+
+```bash
+cd $YOUR_WORK_SPACE
+cd SmartRefine
+bash train.sh
 ```
+
+You can change your training setting. The default `train.sh` looks like as follows:
+```bash
 set -x
 # change root to your path of dataset root.
-data_root=YOUR_DATASET_ROOT_DIR
+data_root=../argo1_data/
 # change p1_root to your path of prediction outputs root.
-p1_root=YOUR_PREDICTION_DATA_ROOT_DIR
+p1_root=../p1_data/
 # experiment name used for logging.
 exp=smartref_hivt_argo1
 # device number.
-ngpus=8
+ngpus=1
 pwd
 
 python train.py \
        --data_root $data_root --p1_root $p1_root --exp $exp \
+       --train_batch_size 32 --val_batch_size 32 \
        --gpus $ngpus --embed_dim 64 --refine_num 5 --seg_num 2 \
        --refine_radius -1 --r_lo 2 --r_hi 10 \
 ```
+
 **_Note_**: The first training epoch will take longer because it preprocess the data at the same time. The regular training time per epoch is around 20~40 minutes varied by different hardware.
 
 The training process will be saved in `$exp/lightning_logs/` automatically. To monitor it:
-```
+```bash
 cd $exp
 tensorboard --logdir lightning_logs/
 ```
 
 ## Evaluation
 To evaluate the model performance:
+```bash
+cd $YOUR_WORK_SPACE
+cd SmartRefine
+bash eval.sh
 ```
-set -x
-# change root to your path of dataset root.
-data_root=YOUR_DATASET_ROOT_DIR
-# the version directory of the experiment name used in training.
-ckpt_version=smartref_hivt_argo1/lightning_logs/version_xxx/
-pwd
 
-python eval.py \
-       --data_root $data_root --ckpt-path $ckpt_version \
-       --refine_num 5 --refine_radius -1 \
-```
 ## Results
 ### Tabular Results
 The expected performance is:

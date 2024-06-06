@@ -8,7 +8,6 @@ from models.refine import Refine
 
 import torch
 import os
-device = torch.device('cuda', int(os.environ.get('LOCAL_RANK')) if os.environ.get('LOCAL_RANK') is not None else 0)
 
 parser = ArgumentParser()
 parser.add_argument('--data_root', type=str, required=True)
@@ -30,7 +29,7 @@ parser = Refine.add_model_specific_args(parser)
 args = parser.parse_args()
 if args.num_workers == 0:
     args.persistent_workers = False
-args.accelerator='gpu'
+args.accelerator='auto'
 if args.gpus > 1:
     args.strategy="ddp_find_unused_parameters_false"
 
@@ -40,6 +39,6 @@ model_checkpoint = ModelCheckpoint(monitor=args.monitor, save_top_k=args.save_to
 base_dir="./"
 trainer = pl.Trainer.from_argparse_args(args, callbacks=[model_checkpoint],
                     default_root_dir=base_dir+args.exp_name)
-model = Refine(**vars(args)).to(device)
+model = Refine(**vars(args))
 datamodule = ArgoverseV1DataModule.from_argparse_args(args)
 trainer.fit(model, datamodule)

@@ -14,13 +14,6 @@ from collections import OrderedDict
 
 from utils import TemporalData
 
-import matplotlib.pyplot as plt
-import io
-import PIL.Image
-from torchvision.transforms import ToTensor
-import numpy as np
-
-import copy
 
 
 class Refine(pl.LightningModule):
@@ -190,7 +183,7 @@ class Refine(pl.LightningModule):
 
         target_score_i = ((max_val - l2_norm.min(0)[0]) / ((max_val - min_val)+1e-6))
         target_score_i = torch.clamp(target_score_i,0,1)
-
+        refine_score_i = refine_score_i[best_mode, torch.arange(data.num_graphs)]
         score_loss_refine = self.score_loss(refine_score_i, target_score_i)
         score_loss_refines += score_loss_refine
 

@@ -20,7 +20,7 @@ class ArgoverseV1DataModule(LightningDataModule):
                  train_transform: Optional[Callable] = None,
                  val_transform: Optional[Callable] = None,
                  # used to pre-process map data 
-                 local_radius: float = 180) -> None:
+                 local_radius: float = 150) -> None:
         super(ArgoverseV1DataModule, self).__init__()
         self.data_root = data_root
         self.p1_root = p1_root
