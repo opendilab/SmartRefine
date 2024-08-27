@@ -17,6 +17,7 @@ if __name__ == '__main__':
 
     parser = ArgumentParser()
     parser.add_argument('--data_root', type=str, required=True)
+    parser.add_argument('--p1_root', type=str, required=True)
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--num_workers', type=int, default=8)
     parser.add_argument('--pin_memory', type=bool, default=True)
@@ -32,9 +33,9 @@ if __name__ == '__main__':
     ckpt_paths.sort()
     ckpt_path = ckpt_paths[-1]
 
-    model = Refine.load_from_checkpoint(checkpoint_path=ckpt_path)
+    model = Refine.load_from_checkpoint(checkpoint_path=ckpt_path, seg_num=2, r_lo=2, r_hi=10, embed_dim=64, strict=False)
     model.eval()
-    val_dataset = ArgoverseV1Dataset(data_root=args.data_root, p1_root='', split='val', local_radius=model.hparams.local_radius)
+    val_dataset = ArgoverseV1Dataset(data_root=args.data_root, p1_root=args.p1_root, split='val')
     dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers,
                         pin_memory=args.pin_memory, persistent_workers=args.persistent_workers)
 

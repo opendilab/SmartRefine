@@ -28,7 +28,7 @@ class TargetRegion(nn.Module):
                  embed_dim: int,
                  refine_num: int,
                  seg_num: int,
-                 local_radius: int,
+                 refine_radius: int,
                  r_lo: int,
                  r_hi: int,
                  **kwargs) -> None:
@@ -36,7 +36,7 @@ class TargetRegion(nn.Module):
         self.num_modes = num_modes
         self.future_steps = future_steps        
         self.embed_dim = embed_dim
-        self.radius = local_radius
+        self.radius = refine_radius
         if self.radius == -1:
             self._radius = [0.8, 0.8*1/2, 0.8*1/4, 0.8*1/8, 0.8*1/16]
         self.refine_num = refine_num
@@ -76,8 +76,6 @@ class TargetRegion(nn.Module):
         score_module.append(nn.GRU(input_size=embed_dim,hidden_size=embed_dim))
         score_module.append(MLPDeltaDecoderScore(embed_dim=embed_dim, with_last=False))
         self.refine_score_decoder = nn.Sequential(*score_module)
-
-        self.drop_edge = DistanceDropEdge(local_radius)
 
         self.apply(init_weights)
 

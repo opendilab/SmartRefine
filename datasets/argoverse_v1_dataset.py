@@ -22,7 +22,7 @@ class ArgoverseV1Dataset(Dataset):
                  p1_root: str,
                  split: str,
                  transform: Optional[Callable] = None,
-                 local_radius: float = 50) -> None:
+                 local_radius: float = 150) -> None:
         self._split = split
         self._local_radius = local_radius
 
